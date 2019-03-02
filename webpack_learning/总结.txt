@@ -1,0 +1,63 @@
+webpack总结：
+    1 webpack项目的创建只需要使用npm init创建package.json和手动创建webpack.config.js文件
+    2 webpack所有的对文件的设置和对代码的优化都在webpack.config.js中进行配置.
+    3 webpakc和vue进行结合时使用vue创建项目的命令：vue init webpack 【proname】项目目录中会自动创建webpack.cinfig.js
+    4 启动webpack： webpack --webpack.config.js 或者直接webpack
+    webpack常用简单配置:
+        1 入口文件是在entry中写入;
+            单个入口文件: entry: {
+                app: 'app.js'
+            }
+            多个入口文件: entry: {
+                app1: 'app1.js'
+                app2: 'app2.js'
+            }
+        2 输出配置在output中: 
+            对应入口文件的单个输出：output:{
+                filename: app.js  //输出的文件名称
+                path: '../../' //输出的路径（绝对路径）,通常在同一目录下可以使用__dirname代替只想从根目录指向当前目录，'./'只相对目录即文件工作的目录，dirname是文件工作的绝对路径
+            }
+            多个入口的输出：output: {
+                filename: [name].js  通常用占位符代替名称
+                path: __dirname + '/dist' 输入到文件当前路径下dist目录里面
+            }
+        3 模式mode配置: mode分为development/production,默认为production,根据不同的mode配置会启用不同的插件
+            常见插件：
+                FlagDependencyUsagePlugin：应该是删除无用代码的，其他插件依赖
+                FlagIncludedChunksPlugin：应该是删除无用代码的，其他插件依赖
+                ModuleConcatenationPlugin：作用域提升 webpack3的scope hosting
+                NoEmitOnErrorsPlugin：遇到错误代码不跳出
+                OccurrenceOrderPlugin
+                SideEffectsFlagPlugin
+                UglifyJsPlugin：js代码压缩
+                process.env.NODE_ENV 的值设为 production
+
+            development: mode: 'development' 
+            production: mode: 'production'  
+            或者启动时命令控制：启动时输入命令： webpack --mode development 或者 webpack --mode production
+        4 loader配置：每一次需要加载或者转化时都要先下载包 npm install --save-dev [包名]
+            配置文件写入: module: {
+                            rules: [
+                                { test: /\.css$/, use: 'css-loader' },常见的加载css文件时候
+                            ]
+                        }
+        5 plugins配置：所需要的插件配置，弥补loader的不足,需要先在文件头引入才可配置
+            plugins: {
+
+            }
+        6 devServer配置；用来搭建服务器的配置
+            devServer: {
+                contentBase: './dist', //配置node服务器的静态文件可访问
+                hot: true  //使用热更新
+            }
+            在node服务器配置文件中需要写入:
+                const webpackDevMiddleware = require("webpack-dev-middleware");
+                const app = express();
+                const config = require("./webpack.config.js");
+                const compiler = webpack(config);
+                app.use(webpackDevMiddleware(compiler, {
+                    publicPath: config.output.publicPath
+                }));
+        7 devtool配置; 此选项控制是否生成，以及如何生成 source map。
+            devtool: 'inline-source-map', //原初始代码
+        8 target配置；webpack为目标指定环境
